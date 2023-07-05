@@ -3,41 +3,65 @@ package services
 import better.files.File
 import data.TypeAliases._
 
-import scala.util.{Success, Try}
-import data.{Point, Result}
+import scala.util.{Success, Try, Failure}
+import data.{Mower, Point, PositionAndDirection, ResultingWork}
 import play.api.libs.json.Json
 import util.MyUtil.outputErrorAndExit
-
-import scala.io.Source
+import util.MyException._
 
 case class FileService() {
+  private val xmlColumns =
+    "numéro;début_x;début_y;début_direction;fin_x;fin_y;fin_direction;instructions\n"
+  private val defaultInvalidPoint = Point(-1, -1)
+  private val defaultInvalidDirection = "X"
+  private val defaultInvalidGardenSize = Array("0", "0")
 
-  def readLinesFromFile(file: String): List[String] = {
-    Try(Source.fromFile(file).getLines().toList) match {
-      case Success(readFile) => readFile
-      case _ => outputErrorAndExit("Could not read file")
-    }
+  def readLinesFromFile(file: String): Try[List[String]] = {
+    Try(File(file).lines.toList).orElse(Failure(FileOpeningException("")))
 
   }
 
-  def extractGardenSizeFromString(rawPoint: Option[String]): GardenSize = {
-    val gardenSize = Try(rawPoint.fold(Array("0", "0"))(value => value.split(" ")))
-      .map(pointArray => Point(pointArray(0).toInt, pointArray(1).toInt))
+  def extractGardenSizeFromString(rawPoint: Option[String]): Try[GardenSize] = {
+    val gardenSize =
+      Try(rawPoint.fold(defaultInvalidGardenSize)(value => value.split(" ")))
+        .map(pointArray => Point(pointArray(0).toInt, pointArray(1).toInt))
     gardenSize match {
       case Success(value) =>
         if (value.x <= 0 || value.y <= 0) {
-          outputErrorAndExit("Garden size invalid")
+          Failure(GardenSizeException("Garden size invalid or absent"))
         } else {
-          value
+          Success(value)
         }
       case _ =>
-        outputErrorAndExit("Could not read or rightfully process garden size")
+        Failure(GardenSizeException("Could not parse garden size"))
     }
   }
 
-  def buildJsonOutput(dataToWrite: Result, file: File): Unit = {
+  def buildJsonOutput(dataToWrite: ResultingWork, file: File): Unit = {
     val dataJsonFormat = Json.toJson(dataToWrite)
-    file.createFileIfNotExists().overwrite(Json.prettyPrint(dataJsonFormat))
-    ()
+    Try(file.createFileIfNotExists().overwrite(Json.prettyPrint(dataJsonFormat))) match {
+      case Success(_) => ()
+      case _ => outputErrorAndExit("Could not write json to file")
+    }
+  }
+
+  def buildCsvOutput(dataToWrite: ResultingWork, file: File): Unit = {
+    def getCsvLineFromData(data: Mower, index: Int): String = {
+      val fin = data.fin.getOrElse(
+        PositionAndDirection(defaultInvalidPoint, defaultInvalidDirection)
+      )
+      s"${index.toString};${data.debut.point.x.toString};${data.debut.point.y.toString};${data.debut.direction};" +
+        s"${fin.point.x.toString};${fin.point.y.toString};${fin.direction};" +
+        s"${data.instructions.mkString}"
+    }
+
+    val dataCsvFormat = dataToWrite.tondeuses.zipWithIndex
+      .map(mower => getCsvLineFromData(mower._1, mower._2))
+      .mkString("\n")
+      .prependedAll(xmlColumns)
+    Try(file.createFileIfNotExists().overwrite(dataCsvFormat)) match {
+      case Success(_) => ()
+      case _ => outputErrorAndExit("Could not write csv to file")
+    }
   }
 }
