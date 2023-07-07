@@ -1,10 +1,11 @@
 package fr.esgi.al.funprog
 
 import com.typesafe.config.ConfigFactory
-//import data.ResultingWork
-import services.{FileService, MowerService}
-//import better.files._
-//import scala.util.Try
+import data.FunProgResult
+import services.{FileService, FormatService, MowerService}
+import better.files._
+
+import scala.util.{Failure, Success, Try}
 
 object Main extends App {
 
@@ -12,41 +13,59 @@ object Main extends App {
   val config = ConfigFactory.load()
   private val dataFile =
     config.getString("application.input-file") // "src/main/resources/test"
-  //private val jsonOutputFile =
-    //config.getString("application.output-json-file").toFile
-  //private val csvOutputFile =
-    //config.getString("application.output-csv-file").toFile
+  private val jsonOutputFile =
+    config.getString("application.output-json-file").toFile
+  private val csvOutputFile =
+    config.getString("application.output-csv-file").toFile
+  private val yamlOutputFile =
+    config.getString("application.output-yaml-file").toFile
 
   // Services
   private val mowerService = MowerService()
   private val fileService = FileService()
+  private val formatService = FormatService()
 
   // Core Program
 
   // Reading file and building Mowers and Limits
   val data = fileService.readLinesFromFile(dataFile)
     .flatMap(lines =>{
-      fileService.extractGardenSizeFromString(lines.headOption).flatMap(
-        gardenSize => mowerService.buildMowersFromLines(lines).map(mowersAtInitialPosition =>
-          (gardenSize, mowersAtInitialPosition)
-        )
-      )
+      for {
+        gardenSize <- fileService.extractGardenSizeFromString(lines.headOption)
+        mowersAtInitialPosition <- mowerService.buildMowersFromLines(lines)
+      } yield (gardenSize, mowersAtInitialPosition)
     })
 
-  println(data)
-/*
   // Calculate final Mower positions
-  private val mowersAtFinalPositions = mowersAtInitialPosition.map(mower => {
-    val finalPositionAndDirection =
-      mowerService.moveMower(mower.debut, mower.instructions, gardenSize)
-    mower.copy(fin = Some(finalPositionAndDirection))
-  })
+  val mowers = data.flatMap{gardenSizeAndMowers =>
+    val mowersAtFinalPositions = Try(gardenSizeAndMowers._2.map(mower => {
+        val finalPositionAndDirection = mowerService.moveMower(mower.debut, mower.instructions, gardenSizeAndMowers._1)
+      mower.copy(fin = Some(finalPositionAndDirection))
+    }))
+  mowersAtFinalPositions
+  }
 
-  private val result = ResultingWork(gardenSize, mowersAtFinalPositions)
+  val resultMowers = for {
+    gardenSize <- data
+    mowersAtFinalPosition <- mowers
+  } yield
+    FunProgResult(gardenSize._1, mowersAtFinalPosition)
 
   // Write files
-  fileService.buildJsonOutput(result, jsonOutputFile)
+  val finalResult = resultMowers.flatMap { result =>
+    fileService.writeJsonOutput(formatService.buildJsonOutput(result), jsonOutputFile).flatMap(
+      _ => fileService.writeCsvOutput(formatService.buildCsvOutput(result), csvOutputFile)
+    )
+  }
 
-  fileService.buildCsvOutput(result, csvOutputFile)
-*/
+  val writtenYaml = resultMowers.flatMap(result => fileService.writeYamlOutput(formatService.buildYamlOutput(result), yamlOutputFile))
+
+  println(writtenYaml)
+  println("The End")
+  finalResult match {
+    case Success(value) => println(value)
+    case Failure(failedValue) => println(failedValue)
+  }
+
+
 }

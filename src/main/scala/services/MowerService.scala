@@ -2,11 +2,10 @@ package services
 
 import data.{Mower, PositionAndDirection}
 import data.TypeAliases._
-import util.MyUtil.outputErrorAndExit
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 import scala.annotation.tailrec
-import util.MyException._
+import util.FunProgExceptions._
 case class MowerService() {
 
   private val FIRST_LINE = 1
@@ -41,41 +40,19 @@ case class MowerService() {
           val startingPositionAndDirection =
             lines(POSITION_AND_DIRECTION_LINE).split(" ")
           val instructions = lines(INSTRUCTIONS_LINE).split("").toList
+          //require(instructions)
           Mower.mower(
             startingPositionAndDirection(X_POSITION).toInt,
             startingPositionAndDirection(Y_POSITION).toInt,
             startingPositionAndDirection(
               DIRECTION_POSITION
-            ), // add validity test
+            ),
             instructions
           )
         })
         .toList
-    )
+    ).recoverWith(exception => Failure(MowerMovementException(exception)))
   }
-/*
-  /**
-   * * buildMowersFromLines checks the return of tryTobuildMowersFromLines and
-   * return is value or an error
-   *
-   * @param rawPositionsAndInstructions
-   * @return
-   */
-  def buildMowersFromLines(
-      rawPositionsAndInstructions: List[String]): List[Mower] = {
-    tryToBuildMowersFromLines(rawPositionsAndInstructions) match {
-      case Success(mowerList) =>
-        if (mowerList.nonEmpty) mowerList
-        else outputErrorAndExit("No mowers found")
-      case _ => outputErrorAndExit("Could not parse file for mowers")
-    }
-  }
-*/
-  // Function de traitement: Prend un truc (probablement objet avec valeurs de départ/tenter interface)
-  // lance fonction qui prend actual position + direction, ListOfInstruction and GardenSize : return final position + Dir
-  // Calls itself with new coords + new direction +new list of instructions
-  // end up cipying entry object + extra info
-  // Benefit !
 
   /**
    * moveMower moves the mower from its initial to its final position using the
@@ -90,10 +67,9 @@ case class MowerService() {
   final def moveMower(
       positionAndDirection: PositionAndDirection,
       instructions: Instruction,
-      gardenSize: GardenSize): Try[PositionAndDirection] = {
-    if (instructions.isEmpty) Success(positionAndDirection)
+      gardenSize: GardenSize): PositionAndDirection = {
+    if (instructions.isEmpty) positionAndDirection
     else {
-      println(instructions.headOption)
       instructions.headOption match {
         case Some(instruction) if (instruction == MOVE_FORWARD) =>
           if (isNextAdvanceValid(positionAndDirection, gardenSize)) {
@@ -123,8 +99,7 @@ case class MowerService() {
             gardenSize
           )
         }
-        case _ =>
-          Failure(FileOpeningException("test"))
+        case _ => positionAndDirection
       }
     }
   }
@@ -146,7 +121,6 @@ case class MowerService() {
       case SOUTH => positionAndDirection.point.y > 0
       case EAST  => positionAndDirection.point.x < gardenSize.x
       case WEST  => positionAndDirection.point.x > 0
-      case _     => outputErrorAndExit("Direction is not a valid parameter")
     }
   }
 }

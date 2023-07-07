@@ -3,15 +3,18 @@ package data
 import util.MyUtil.outputErrorAndExit
 import play.api.libs.json._
 import data.TypeAliases._
+import org.scalactic._
+import Requirements._
+import Directions._
 
-case class PositionAndDirection(point: Point, direction: Direction)
+case class PositionAndDirection(
+                                 point: Point, direction: Direction){
+  require("NSEW".contains(direction))
+  require(direction.size == 1)
+}
 
 object PositionAndDirection {
 
-  private val NORTH = "N"
-  private val EAST = "E"
-  private val SOUTH = "S"
-  private val WEST = "W"
   private val GAUCHE = "G"
 
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
@@ -46,14 +49,13 @@ object PositionAndDirection {
   }
 
   def updateDirection(
-      previousPositionAndDirection: PositionAndDirection,
-      direction: String): PositionAndDirection = {
+                       previousPositionAndDirection: PositionAndDirection,
+                       turn: String): PositionAndDirection = {
     val newDirection = previousPositionAndDirection.direction match {
-      case NORTH => if (direction == GAUCHE) WEST else EAST
-      case EAST  => if (direction == GAUCHE) NORTH else SOUTH
-      case SOUTH => if (direction == GAUCHE) EAST else WEST
-      case WEST  => if (direction == GAUCHE) SOUTH else NORTH
-      case _     => outputErrorAndExit("Direction not valid")
+      case NORTH => if (turn == GAUCHE) WEST else EAST
+      case EAST  => if (turn == GAUCHE) NORTH else SOUTH
+      case SOUTH => if (turn == GAUCHE) EAST else WEST
+      case WEST  => if (turn == GAUCHE) SOUTH else NORTH
     }
     previousPositionAndDirection.copy(direction = newDirection)
   }
