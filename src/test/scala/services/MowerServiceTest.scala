@@ -7,11 +7,18 @@ import scala.util.Success
 
 class MowerServiceTest extends AnyFunSuite {
 
-  val mowerService = MowerService()
+  val mowerService: MowerService = MowerService()
 
-  val resultingWork = FunProgResult(
+  val resultingWork: FunProgResult = FunProgResult(
     Point(2, 2),
-    List(Mower(PositionAndDirection(Point(1, 1), "N"), List("A", "D", "A", "G"), Some(PositionAndDirection(Point(2, 2), "N")))))
+    List(
+      Mower(
+        PositionAndDirection(Point(1, 1), "N"),
+        List("A", "D", "A", "G"),
+        Some(PositionAndDirection(Point(2, 2), "N"))
+      )
+    )
+  )
 
   test("buildMowersFromLines should return a valid list of Mowers") {
     val validStringList = List("1 1", "1 2 S", "AADDBC")
@@ -25,7 +32,7 @@ class MowerServiceTest extends AnyFunSuite {
     )
     result match {
       case Success(value) => assert(value === expectedResult)
-      case _ => fail("Should not pass through here")
+      case _              => fail("Should not pass through here")
     }
   }
 
@@ -37,7 +44,7 @@ class MowerServiceTest extends AnyFunSuite {
     assert(result === expectedResult)
   }
 
-  test("something"){
+  test("something") {
     import services.FormatService
     val formatService = FormatService()
 

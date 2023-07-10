@@ -4,8 +4,7 @@ import play.api.libs.json._
 import org.scalactic._
 import Requirements._
 
-
-case class Point(x: Int, y: Int){
+case class Point(x: Int, y: Int) {
   require(x >= 0 && y >= 0)
 }
 

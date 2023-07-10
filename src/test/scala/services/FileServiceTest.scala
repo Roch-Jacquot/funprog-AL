@@ -12,11 +12,20 @@ class FileServiceTest extends AnyFunSuite {
   val testFile = "src/test/resources/readFile.txt"
   val resultFileJson = "src/test/resources/result.json"
   val resultFileCsv = "src/test/resources/result.csv"
-  val fileService = FileService()
-  val formatService = FormatService()
-  val resultingWork = FunProgResult(
+  val resultFileYaml = "src/test/resources/result.yaml"
+
+  val fileService: FileService = FileService()
+  val formatService: FormatService = FormatService()
+  val resultingWork: FunProgResult = FunProgResult(
     Point(2, 2),
-    List(Mower(PositionAndDirection(Point(1, 1), "N"), List("A","D","A","G"), Some(PositionAndDirection(Point(2, 2), "N")))))
+    List(
+      Mower(
+        PositionAndDirection(Point(1, 1), "N"),
+        List("A", "D", "A", "G"),
+        Some(PositionAndDirection(Point(2, 2), "N"))
+      )
+    )
+  )
   val falseFileAdress = ""
 
   test(
@@ -31,7 +40,8 @@ class FileServiceTest extends AnyFunSuite {
   ) {
     val result = fileService.readLinesFromFile(falseFileAdress)
     result match {
-      case Failure(failure) => assert(failure.getClass.getSimpleName === "FileOpeningException")
+      case Failure(failure) =>
+        assert(failure.getClass.getSimpleName === "FileOpeningException")
       case _ => fail("Should not pass through here")
     }
   }
@@ -41,7 +51,7 @@ class FileServiceTest extends AnyFunSuite {
     val result = fileService.extractGardenSizeFromString(rawGardenSize)
     result match {
       case Success(value) => assert(value === Point(5, 5))
-      case _ => fail("Should not pass through here")
+      case _              => fail("Should not pass through here")
     }
   }
 
@@ -49,7 +59,8 @@ class FileServiceTest extends AnyFunSuite {
     val rawGardenSize = Some("5 ")
     val result = fileService.extractGardenSizeFromString(rawGardenSize)
     result match {
-      case Failure(failure) => assert(failure.getClass.getSimpleName === "GardenSizeException")
+      case Failure(failure) =>
+        assert(failure.getClass.getSimpleName === "GardenSizeException")
       case _ => fail("Should not pass through here")
     }
   }
@@ -87,7 +98,8 @@ class FileServiceTest extends AnyFunSuite {
     val jsonFile = fileService.writeJsonOutput(dataToWrite, file)
 
     jsonFile match {
-      case Failure(failure) => assert(failure.getClass.getSimpleName === "FileWritingException")
+      case Failure(failure) =>
+        assert(failure.getClass.getSimpleName === "FileWritingException")
       case _ => fail("Should not pass through here")
     }
   }
@@ -100,8 +112,36 @@ class FileServiceTest extends AnyFunSuite {
     val csvFile = fileService.writeCsvOutput(dataToWrite, file)
 
     csvFile match {
-      case Failure(failure) => assert(failure.getClass.getSimpleName === "FileWritingException")
+      case Failure(failure) =>
+        assert(failure.getClass.getSimpleName === "FileWritingException")
       case _ => fail("Should not pass through here")
     }
   }
+  test(
+    "writeYamlOutput should  write a yaml file for the object ResultingWork"
+  ) {
+    val file: File = File(resultFileYaml)
+    val dataToWrite = formatService.buildYamlOutput(resultingWork)
+    val yamlFile = fileService.writeYamlOutput(dataToWrite, file)
+
+    yamlFile match {
+      case Success(_) => Succeeded
+      case Failure(_) => fail("Should not pass through here")
+    }
+  }
+
+  test(
+    "writeYamlOutput should fail to write a csv file for the object ResultingWork"
+  ) {
+    val file: File = File(falseFileAdress)
+    val dataToWrite = formatService.buildYamlOutput(resultingWork)
+    val csvFile = fileService.writeYamlOutput(dataToWrite, file)
+
+    csvFile match {
+      case Failure(failure) =>
+        assert(failure.getClass.getSimpleName === "FileWritingException")
+      case _ => fail("Should not pass through here")
+    }
+  }
+
 }

@@ -5,17 +5,27 @@ import play.api.libs.json.Json
 
 case class FormatService() {
 
-  private val csvColumns =
+  private val csvColumns = {
     "numéro;début_x;début_y;début_direction;fin_x;fin_y;fin_direction;instructions\n"
+  }
+  private val instructions = "instructions:"
+  private val directionKey = "direction: "
+  private val basicSpacing = " "
+  private val xKey = "x: "
+  private val yKey = "y: "
+  private val yamlBorder = "---"
+  private val mowerFrench = "tondeuses:"
+  private val garden = "limite:"
+  private val startPoint = "- debut:"
+  private val endPoint = "fin:"
+  private val point = "point:"
 
   def buildCsvOutput(dataToWrite: FunProgResult): String = {
-    def getCsvLineFromData(data: Mower, index: Int): String = {
-      val (xFin, yFin, direction) = data.fin
-        .map(posAndDirAndInstr =>
-          (posAndDirAndInstr.point.x.toString, posAndDirAndInstr.point.y.toString, posAndDirAndInstr.direction)).getOrElse(("", "", ""))
-      s"${index.toString};${data.debut.point.x.toString};${data.debut.point.y.toString};${data.debut.direction};" +
+    def getCsvLineFromData(mower: Mower, index: Int): String = {
+      val (xFin, yFin, direction) = extractFinFromMower(mower)
+      s"${index.toString};${mower.debut.point.x.toString};${mower.debut.point.y.toString};${mower.debut.direction};" +
         s"$xFin;$yFin;$direction;" +
-        s"${data.instructions.mkString}"
+        s"${mower.instructions.mkString}"
     }
 
     dataToWrite.tondeuses.zipWithIndex
@@ -29,31 +39,59 @@ case class FormatService() {
   }
 
   def buildYamlOutput(dataToWrite: FunProgResult): List[String] = {
-    val result = List("---",
-      "limite:", " x: " + dataToWrite.limite.x.toString
-      , " y: " + dataToWrite.limite.y.toString
-      , "tondeuses:")
+    val result = List(
+      yamlBorder,
+      garden,
+      basicSpacing + xKey + dataToWrite.limite.x.toString,
+      basicSpacing + yKey + dataToWrite.limite.y.toString,
+      mowerFrench
+    )
 
-    val mowers = dataToWrite.tondeuses.flatMap(mower => mowerToYamlFormat(mower))
-    result.appendedAll(mowers).appended("---")
+    val mowers =
+      dataToWrite.tondeuses.flatMap(mower => mowerToYamlFormat(mower))
+    result.appendedAll(mowers).appended(yamlBorder)
   }
-  private def pointToYamlFormat(x: String, y: String, repeat: Int): List[String] =
-    List(" ".repeat(repeat).concat("point:"),
-      " ".repeat(repeat + 2).concat("x: " + x + ""),
-      " ".repeat(repeat + 2).concat("y: " + y + ""))
-  def mowerToYamlFormat(mower: Mower): List[String] = {
-    val (xFin, yFin, direction) = mower.fin
-      .map(posAndDirAndInstr =>
-        (posAndDirAndInstr.point.x.toString, posAndDirAndInstr.point.y.toString, posAndDirAndInstr.direction)).getOrElse(("", "", ""))
+  private def pointToYamlFormat(
+      x: String,
+      y: String,
+      repeat: Int): List[String] =
+    List(
+      basicSpacing.repeat(repeat).concat(point),
+      basicSpacing.repeat(repeat + 2).concat(xKey + x),
+      basicSpacing.repeat(repeat + 2).concat(yKey + y)
+    )
+  private def mowerToYamlFormat(mower: Mower): List[String] = {
+    val (xFin, yFin, direction) = extractFinFromMower(mower)
 
-    List("- debut:").appendedAll(
-      pointToYamlFormat(mower.debut.point.x.toString, mower.debut.point.y.toString, 4))
-      .appendedAll(
-        List(" ".repeat(4).concat("direction: " + mower.debut.direction),
-          " ".repeat(2).concat("instructions:")))
-      .appendedAll(mower.instructions.map(instr => "  - " + instr))
-      .appended(" ".repeat(2).concat("fin:"))
-      .appendedAll(pointToYamlFormat(xFin, yFin, 4))
-      .appended(" ".repeat(4).concat("direction: " + direction))
+    List(startPoint) :::
+      pointToYamlFormat(
+        mower.debut.point.x.toString,
+        mower.debut.point.y.toString,
+        4
+      ) :::
+      List(
+        basicSpacing.repeat(4).concat(directionKey + mower.debut.direction)
+      ) :::
+      instructionsToYaml(mower)
+        .appended(basicSpacing.repeat(2).concat(endPoint)) :::
+      pointToYamlFormat(xFin, yFin, 4)
+        .appended(basicSpacing.repeat(4).concat(directionKey + direction))
+  }
+
+  private def extractFinFromMower(mower: Mower): (String, String, String) = {
+    mower.fin
+      .map(posAndDirAndInstr =>
+        (
+          posAndDirAndInstr.point.x.toString,
+          posAndDirAndInstr.point.y.toString,
+          posAndDirAndInstr.direction
+        )
+      )
+      .getOrElse(("", "", ""))
+  }
+
+  private def instructionsToYaml(mower: Mower): List[String] = {
+    List(basicSpacing.repeat(2).concat(instructions)) ::: mower.instructions
+      .map(instr => "  - " + instr)
   }
 }

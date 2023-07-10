@@ -24,8 +24,8 @@ case class MowerService() {
   private val WEST = "W"
 
   /**
-   * * buildMowersFromLines attempts to transform the list of strings
-   * containing the positions and instructions into a Try[List[Mowers]
+   * * buildMowersFromLines attempts to transform the list of strings containing
+   * the positions and instructions into a Try[List[Mowers]
    *
    * @param rawPositionsAndInstructions
    * @return
@@ -40,7 +40,7 @@ case class MowerService() {
           val startingPositionAndDirection =
             lines(POSITION_AND_DIRECTION_LINE).split(" ")
           val instructions = lines(INSTRUCTIONS_LINE).split("").toList
-          //require(instructions)
+          // require(instructions)
           Mower.mower(
             startingPositionAndDirection(X_POSITION).toInt,
             startingPositionAndDirection(Y_POSITION).toInt,
@@ -71,7 +71,7 @@ case class MowerService() {
     if (instructions.isEmpty) positionAndDirection
     else {
       instructions.headOption match {
-        case Some(instruction) if (instruction == MOVE_FORWARD) =>
+        case Some(instruction) if instruction == MOVE_FORWARD =>
           if (isNextAdvanceValid(positionAndDirection, gardenSize)) {
             val nextPositionWithDirection =
               PositionAndDirection.updatePosition(positionAndDirection)
@@ -88,7 +88,7 @@ case class MowerService() {
             )
           }
         case Some(instruction)
-            if LEFT_RIGHT_INSTRUCTIONS.contains(instruction) => {
+            if LEFT_RIGHT_INSTRUCTIONS.contains(instruction) =>
           val nextDirectionWithPosition = PositionAndDirection.updateDirection(
             positionAndDirection,
             instruction
@@ -98,7 +98,6 @@ case class MowerService() {
             instructions.drop(CURRENT_INSTRUCTION),
             gardenSize
           )
-        }
         case _ => positionAndDirection
       }
     }

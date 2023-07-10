@@ -1,14 +1,12 @@
 package data
 
-import util.MyUtil.outputErrorAndExit
 import play.api.libs.json._
 import data.TypeAliases._
 import org.scalactic._
 import Requirements._
 import Directions._
 
-case class PositionAndDirection(
-                                 point: Point, direction: Direction){
+case class PositionAndDirection(point: Point, direction: Direction) {
   require("NSEW".contains(direction))
   require(direction.size == 1)
 }
@@ -43,14 +41,12 @@ object PositionAndDirection {
         previousPositionAndDirection.copy(point =
           previousPosition.copy(x = previousPosition.x - 1)
         )
-      case _ =>
-        outputErrorAndExit("Direction not valid")
     }
   }
 
   def updateDirection(
-                       previousPositionAndDirection: PositionAndDirection,
-                       turn: String): PositionAndDirection = {
+      previousPositionAndDirection: PositionAndDirection,
+      turn: String): PositionAndDirection = {
     val newDirection = previousPositionAndDirection.direction match {
       case NORTH => if (turn == GAUCHE) WEST else EAST
       case EAST  => if (turn == GAUCHE) NORTH else SOUTH

@@ -28,8 +28,9 @@ object Main extends App {
   // Core Program
 
   // Reading file and building Mowers and Limits
-  val data = fileService.readLinesFromFile(dataFile)
-    .flatMap(lines =>{
+  val data = fileService
+    .readLinesFromFile(dataFile)
+    .flatMap(lines => {
       for {
         gardenSize <- fileService.extractGardenSizeFromString(lines.headOption)
         mowersAtInitialPosition <- mowerService.buildMowersFromLines(lines)
@@ -37,35 +38,40 @@ object Main extends App {
     })
 
   // Calculate final Mower positions
-  val mowers = data.flatMap{gardenSizeAndMowers =>
+  val mowers = data.flatMap { gardenSizeAndMowers =>
     val mowersAtFinalPositions = Try(gardenSizeAndMowers._2.map(mower => {
-        val finalPositionAndDirection = mowerService.moveMower(mower.debut, mower.instructions, gardenSizeAndMowers._1)
+      val finalPositionAndDirection = mowerService.moveMower(
+        mower.debut,
+        mower.instructions,
+        gardenSizeAndMowers._1
+      )
       mower.copy(fin = Some(finalPositionAndDirection))
     }))
-  mowersAtFinalPositions
+    mowersAtFinalPositions
   }
 
   val resultMowers = for {
-    gardenSize <- data
+    gardenSize            <- data
     mowersAtFinalPosition <- mowers
-  } yield
-    FunProgResult(gardenSize._1, mowersAtFinalPosition)
+  } yield FunProgResult(gardenSize._1, mowersAtFinalPosition)
 
   // Write files
   val finalResult = resultMowers.flatMap { result =>
-    fileService.writeJsonOutput(formatService.buildJsonOutput(result), jsonOutputFile).flatMap(
-      _ => fileService.writeCsvOutput(formatService.buildCsvOutput(result), csvOutputFile)
-    )
+    fileService
+      .writeJsonOutput(formatService.buildJsonOutput(result), jsonOutputFile)
+      .flatMap(_ =>
+        fileService
+          .writeCsvOutput(formatService.buildCsvOutput(result), csvOutputFile)
+          .flatMap(_ => fileService.writeYamlOutput(
+            formatService.buildYamlOutput(result),
+            yamlOutputFile)
+      )
+      )
   }
 
-  val writtenYaml = resultMowers.flatMap(result => fileService.writeYamlOutput(formatService.buildYamlOutput(result), yamlOutputFile))
-
-  println(writtenYaml)
-  println("The End")
   finalResult match {
-    case Success(value) => println(value)
-    case Failure(failedValue) => println(failedValue)
+    case Success(_)       => println("Files created successfully")
+    case Failure(failedValue) => println("Execution failed due to : "+ failedValue.toString)
   }
-
 
 }
