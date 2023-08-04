@@ -20,7 +20,8 @@ lazy val root = (project in file("."))
       typesafeConfig,
       playJson,
       scalatic,
-      scalaTest  % Test
+      scalaTest  % Test,
+      enumeratum
     ),
     // Wartremover
     wartremoverWarnings ++= Warts.unsafe,
@@ -40,6 +41,7 @@ val compilerOptions = Seq(
   "-Xcheckinit", // Wrap field accessors to throw an exception on uninitialized access.
   "-Werror", // Fail the compilation if there are any warnings.
   "-Ymacro-annotations",
+  //"-Yretain-trees",
   // Warning settings
   //
   // "-Wself-implicit",

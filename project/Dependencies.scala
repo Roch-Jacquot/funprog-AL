@@ -6,4 +6,5 @@ object Dependencies {
   lazy val playJson = "com.typesafe.play" %% "play-json" % "2.9.4"
   lazy val scalatic = "org.scalactic" %% "scalactic" % "3.2.16"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.16"
+  lazy val enumeratum = "com.beachape" %% "enumeratum" % "1.7.3"
 }

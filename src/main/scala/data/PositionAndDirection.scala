@@ -1,12 +1,11 @@
 package data
 
 import play.api.libs.json._
-import data.TypeAliases._
 import org.scalactic._
 import Requirements._
 import Directions._
 
-case class PositionAndDirection(point: Point, direction: Direction) {
+case class PositionAndDirection(point: Point, direction: String) {
   require("NSEW".contains(direction))
   require(direction.size == 1)
 }
@@ -24,20 +23,20 @@ object PositionAndDirection {
   def updatePosition(previousPositionAndDirection: PositionAndDirection)
       : PositionAndDirection = {
     val previousPosition = previousPositionAndDirection.point
-    previousPositionAndDirection.direction match {
-      case NORTH =>
+    Directions.withName(previousPositionAndDirection.direction) match {
+      case North =>
         previousPositionAndDirection.copy(point =
           previousPosition.copy(y = previousPosition.y + 1)
         )
-      case EAST =>
+      case East =>
         previousPositionAndDirection.copy(point =
           previousPosition.copy(x = previousPosition.x + 1)
         )
-      case SOUTH =>
+      case South =>
         previousPositionAndDirection.copy(point =
           previousPosition.copy(y = previousPosition.y - 1)
         )
-      case WEST =>
+      case West =>
         previousPositionAndDirection.copy(point =
           previousPosition.copy(x = previousPosition.x - 1)
         )
@@ -47,11 +46,11 @@ object PositionAndDirection {
   def updateDirection(
       previousPositionAndDirection: PositionAndDirection,
       turn: String): PositionAndDirection = {
-    val newDirection = previousPositionAndDirection.direction match {
-      case NORTH => if (turn == GAUCHE) WEST else EAST
-      case EAST  => if (turn == GAUCHE) NORTH else SOUTH
-      case SOUTH => if (turn == GAUCHE) EAST else WEST
-      case WEST  => if (turn == GAUCHE) SOUTH else NORTH
+    val newDirection = Directions.withName(previousPositionAndDirection.direction) match {
+      case North => if (turn == GAUCHE) "W" else "E"
+      case East  => if (turn == GAUCHE) "N" else "S"
+      case South => if (turn == GAUCHE) "E" else "W"
+      case West  => if (turn == GAUCHE) "S" else "N"
     }
     previousPositionAndDirection.copy(direction = newDirection)
   }
