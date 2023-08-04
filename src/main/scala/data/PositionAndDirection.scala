@@ -4,6 +4,7 @@ import play.api.libs.json._
 import org.scalactic._
 import Requirements._
 import Directions._
+import Instructions._
 
 case class PositionAndDirection(point: Point, direction: String) {
   require("NSEW".contains(direction))
@@ -11,8 +12,6 @@ case class PositionAndDirection(point: Point, direction: String) {
 }
 
 object PositionAndDirection {
-
-  private val GAUCHE = "G"
 
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
   implicit val positionAndDirectionRead: Reads[PositionAndDirection] =
@@ -47,10 +46,10 @@ object PositionAndDirection {
       previousPositionAndDirection: PositionAndDirection,
       turn: String): PositionAndDirection = {
     val newDirection = Directions.withName(previousPositionAndDirection.direction) match {
-      case North => if (turn == GAUCHE) "W" else "E"
-      case East  => if (turn == GAUCHE) "N" else "S"
-      case South => if (turn == GAUCHE) "E" else "W"
-      case West  => if (turn == GAUCHE) "S" else "N"
+      case North => if (Instructions.withName(turn) == Left) "W" else "E"
+      case East  => if (Instructions.withName(turn) == Left) "N" else "S"
+      case South => if (Instructions.withName(turn) == Left) "E" else "W"
+      case West  => if (Instructions.withName(turn) == Left) "S" else "N"
     }
     previousPositionAndDirection.copy(direction = newDirection)
   }

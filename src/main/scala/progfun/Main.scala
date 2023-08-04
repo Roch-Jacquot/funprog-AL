@@ -2,7 +2,7 @@ package fr.esgi.al.funprog
 
 import com.typesafe.config.ConfigFactory
 import data.FunProgResult
-import services.{FileService, FormatService, MowerService}
+import services.{FileService, FormatService, MowerService, ParseAndValidateService}
 import better.files._
 
 import scala.util.{Failure, Success, Try}
@@ -22,8 +22,12 @@ object Main extends App {
 
   // Services
   private val mowerService = MowerService()
-  private val fileService = FileService()
+  private val fileService = FileService
   private val formatService = FormatService()
+  private val parseAndValidateService = ParseAndValidateService
+
+  // Constants
+  private val GARDEN_SIZE_LINE = 1;
 
   // Core Program
 
@@ -32,8 +36,8 @@ object Main extends App {
     .readLinesFromFile(dataFile)
     .flatMap(lines => {
       for {
-        gardenSize <- fileService.extractGardenSizeFromString(lines.headOption)
-        mowersAtInitialPosition <- mowerService.buildMowersFromLines(lines)
+        gardenSize <- parseAndValidateService.extractGardenSizeFromString(lines.headOption)
+        mowersAtInitialPosition <- parseAndValidateService.buildMowersFromLines(lines.drop(GARDEN_SIZE_LINE))
       } yield (gardenSize, mowersAtInitialPosition)
     })
 

@@ -1,20 +1,11 @@
 package services
 
-import data.{Mower, PositionAndDirection}
+import data.PositionAndDirection
 import data.TypeAliases._
 
-import scala.util.{Failure, Try}
 import scala.annotation.tailrec
-import util.FunProgExceptions._
 case class MowerService() {
 
-  private val FIRST_LINE = 1
-  private val POSITION_AND_INSTRUCTION_LINES = 2
-  private val POSITION_AND_DIRECTION_LINE = 0
-  private val INSTRUCTIONS_LINE = 1
-  private val X_POSITION = 0
-  private val Y_POSITION = 1
-  private val DIRECTION_POSITION = 2
   private val CURRENT_INSTRUCTION = 1
   private val MOVE_FORWARD = "A"
   private val LEFT_RIGHT_INSTRUCTIONS = "GD"
@@ -23,36 +14,6 @@ case class MowerService() {
   private val SOUTH = "S"
   private val WEST = "W"
 
-  /**
-   * * buildMowersFromLines attempts to transform the list of strings containing
-   * the positions and instructions into a Try[List[Mowers]
-   *
-   * @param rawPositionsAndInstructions
-   * @return
-   */
-  def buildMowersFromLines(
-      rawPositionsAndInstructions: List[String]): Try[List[Mower]] = {
-    Try(
-      rawPositionsAndInstructions
-        .drop(FIRST_LINE)
-        .grouped(POSITION_AND_INSTRUCTION_LINES)
-        .map(lines => {
-          val startingPositionAndDirection =
-            lines(POSITION_AND_DIRECTION_LINE).split(" ")
-          val instructions = lines(INSTRUCTIONS_LINE).split("").toList
-          // require(instructions)
-          Mower.mower(
-            startingPositionAndDirection(X_POSITION).toInt,
-            startingPositionAndDirection(Y_POSITION).toInt,
-            startingPositionAndDirection(
-              DIRECTION_POSITION
-            ),
-            instructions
-          )
-        })
-        .toList
-    ).recoverWith(exception => Failure(MowerMovementException(exception)))
-  }
 
   /**
    * moveMower moves the mower from its initial to its final position using the
@@ -66,10 +27,8 @@ case class MowerService() {
   @tailrec
   final def moveMower(
       positionAndDirection: PositionAndDirection,
-      instructions: Instruction,
+      instructions: List[String],
       gardenSize: GardenSize): PositionAndDirection = {
-    if (instructions.isEmpty) positionAndDirection
-    else {
       instructions.headOption match {
         case Some(instruction) if instruction == MOVE_FORWARD =>
           if (isNextAdvanceValid(positionAndDirection, gardenSize)) {
@@ -100,7 +59,6 @@ case class MowerService() {
           )
         case _ => positionAndDirection
       }
-    }
   }
 
   /**

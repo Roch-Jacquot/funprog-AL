@@ -18,7 +18,7 @@ object Mower {
       x: Int,
       y: Int,
       direction: Direction,
-      instructions: Instruction): Mower = {
+      instructions: List[String]): Mower = {
     val debut = PositionAndDirection(Point(x, y), direction)
     Mower(debut, instructions, None)
   }
