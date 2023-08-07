@@ -1,17 +1,19 @@
 package data
 
+import data.Direction._
+import data.Instruction._
 import org.scalatest.funsuite.AnyFunSuite
 
 class PositionAndDirectionTest extends AnyFunSuite {
 
   val positionAndDirectionNorth: PositionAndDirection =
-    PositionAndDirection(Point(1, 1), "N")
+    PositionAndDirection(Point(1, 1), North)
   val positionAndDirectionSouth: PositionAndDirection =
-    PositionAndDirection(Point(1, 1), "S")
+    PositionAndDirection(Point(1, 1), South)
   val positionAndDirectionEast: PositionAndDirection =
-    PositionAndDirection(Point(1, 1), "E")
+    PositionAndDirection(Point(1, 1), East)
   val positionAndDirectionWest: PositionAndDirection =
-    PositionAndDirection(Point(1, 1), "W")
+    PositionAndDirection(Point(1, 1), West)
 
   test(
     "updatePosition should return a new position North of the previous one"
@@ -54,7 +56,7 @@ class PositionAndDirectionTest extends AnyFunSuite {
     "updateDirection Should update the direction toward East (from North)"
   ) {
     val result =
-      PositionAndDirection.updateDirection(positionAndDirectionNorth, "D")
+      PositionAndDirection.updateDirection(positionAndDirectionNorth, Right)
 
     assert(result === positionAndDirectionEast)
   }
@@ -62,7 +64,7 @@ class PositionAndDirectionTest extends AnyFunSuite {
     "updateDirection Should update the direction toward East (from South)"
   ) {
     val result =
-      PositionAndDirection.updateDirection(positionAndDirectionSouth, "G")
+      PositionAndDirection.updateDirection(positionAndDirectionSouth, Left)
 
     assert(result === positionAndDirectionEast)
   }
@@ -70,7 +72,7 @@ class PositionAndDirectionTest extends AnyFunSuite {
     "updateDirection Should update the direction toward North (from east)"
   ) {
     val result =
-      PositionAndDirection.updateDirection(positionAndDirectionEast, "G")
+      PositionAndDirection.updateDirection(positionAndDirectionEast, Left)
 
     assert(result === positionAndDirectionNorth)
   }
@@ -78,7 +80,7 @@ class PositionAndDirectionTest extends AnyFunSuite {
     "updateDirection Should update the direction toward North (from West)"
   ) {
     val result =
-      PositionAndDirection.updateDirection(positionAndDirectionWest, "D")
+      PositionAndDirection.updateDirection(positionAndDirectionWest, Right)
 
     assert(result === positionAndDirectionNorth)
   }

@@ -1,12 +1,8 @@
 package data
 
 import play.api.libs.json._
-import org.scalactic._
-import Requirements._
 
-case class Point(x: Int, y: Int) {
-  require(x >= 0 && y >= 0)
-}
+case class Point(x: Int, y: Int)
 
 object Point {
 

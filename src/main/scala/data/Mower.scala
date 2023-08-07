@@ -1,11 +1,10 @@
 package data
 
 import play.api.libs.json._
-import TypeAliases._
 
 case class Mower(
     debut: PositionAndDirection,
-    instructions: List[String],
+    instructions: List[Instruction],
     fin: Option[PositionAndDirection]
 )
 object Mower {
@@ -18,7 +17,7 @@ object Mower {
       x: Int,
       y: Int,
       direction: Direction,
-      instructions: List[String]): Mower = {
+      instructions: List[Instruction]): Mower = {
     val debut = PositionAndDirection(Point(x, y), direction)
     Mower(debut, instructions, None)
   }

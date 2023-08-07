@@ -1,19 +1,14 @@
 package services
 
-import data.PositionAndDirection
+import data.Direction._
+import data.Instruction._
+import data.{Instruction, PositionAndDirection}
 import data.TypeAliases._
 
 import scala.annotation.tailrec
 case class MowerService() {
 
   private val CURRENT_INSTRUCTION = 1
-  private val MOVE_FORWARD = "A"
-  private val LEFT_RIGHT_INSTRUCTIONS = "GD"
-  private val NORTH = "N"
-  private val EAST = "E"
-  private val SOUTH = "S"
-  private val WEST = "W"
-
 
   /**
    * moveMower moves the mower from its initial to its final position using the
@@ -27,11 +22,13 @@ case class MowerService() {
   @tailrec
   final def moveMower(
       positionAndDirection: PositionAndDirection,
-      instructions: List[String],
+      instructions: List[Instruction],
       gardenSize: GardenSize): PositionAndDirection = {
-      instructions.headOption match {
-        case Some(instruction) if instruction == MOVE_FORWARD =>
-          if (isNextAdvanceValid(positionAndDirection, gardenSize)) {
+      println(instructions)
+      println(instructions.isEmpty)
+    println("next move valid " +isNextAdvanceValid(positionAndDirection, gardenSize).toString)
+      instructions match {
+        case instruction::_ if instruction == Forward && isNextAdvanceValid(positionAndDirection, gardenSize) =>
             val nextPositionWithDirection =
               PositionAndDirection.updatePosition(positionAndDirection)
             moveMower(
@@ -39,15 +36,14 @@ case class MowerService() {
               instructions.drop(CURRENT_INSTRUCTION),
               gardenSize
             )
-          } else {
+        case instruction::_ if instruction == Forward =>
             moveMower(
               positionAndDirection,
               instructions.drop(CURRENT_INSTRUCTION),
               gardenSize
             )
-          }
-        case Some(instruction)
-            if LEFT_RIGHT_INSTRUCTIONS.contains(instruction) =>
+        case instruction::_ if instruction == Left || instruction == Right =>
+          println("updating direction with" + instruction.toString)
           val nextDirectionWithPosition = PositionAndDirection.updateDirection(
             positionAndDirection,
             instruction
@@ -57,7 +53,10 @@ case class MowerService() {
             instructions.drop(CURRENT_INSTRUCTION),
             gardenSize
           )
-        case _ => positionAndDirection
+        case _ => {
+          println("No move")
+          positionAndDirection
+        }
       }
   }
 
@@ -74,10 +73,10 @@ case class MowerService() {
       positionAndDirection: PositionAndDirection,
       gardenSize: GardenSize): Boolean = {
     positionAndDirection.direction match {
-      case NORTH => positionAndDirection.point.y < gardenSize.y
-      case SOUTH => positionAndDirection.point.y > 0
-      case EAST  => positionAndDirection.point.x < gardenSize.x
-      case WEST  => positionAndDirection.point.x > 0
+      case North => positionAndDirection.point.y < gardenSize.y
+      case South => positionAndDirection.point.y > 0
+      case East  => positionAndDirection.point.x < gardenSize.x
+      case West  => positionAndDirection.point.x > 0
     }
   }
 }

@@ -1,6 +1,8 @@
 package services
 
-import data.{FunProgResult, Mower, Point, PositionAndDirection}
+import data.Direction.North
+import data.Instruction._
+import data.{FunProgResult, Instruction, Mower, Point, PositionAndDirection}
 import org.scalatest.funsuite.AnyFunSuite
 
 class FormatServiceTest extends AnyFunSuite {
@@ -9,9 +11,9 @@ class FormatServiceTest extends AnyFunSuite {
     Point(2, 2),
     List(
       Mower(
-        PositionAndDirection(Point(1, 1), "N"),
-        List("A", "D", "A", "G"),
-        Some(PositionAndDirection(Point(2, 2), "N"))
+        PositionAndDirection(Point(1, 1), North),
+        List[Instruction](Forward, Right, Forward, Left),
+        Some(PositionAndDirection(Point(2, 2), North))
       )
     )
   )

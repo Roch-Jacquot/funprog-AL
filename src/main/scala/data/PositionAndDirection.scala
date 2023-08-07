@@ -1,14 +1,12 @@
 package data
 
 import play.api.libs.json._
-import org.scalactic._
-import Requirements._
-import Directions._
-import Instructions._
+import Direction._
+import Instruction._
 
-case class PositionAndDirection(point: Point, direction: String) {
-  require("NSEW".contains(direction))
-  require(direction.size == 1)
+case class PositionAndDirection(point: Point, direction: Direction) {
+  //require("NSEW".contains(direction))
+  //require(direction.size == 1)
 }
 
 object PositionAndDirection {
@@ -22,7 +20,7 @@ object PositionAndDirection {
   def updatePosition(previousPositionAndDirection: PositionAndDirection)
       : PositionAndDirection = {
     val previousPosition = previousPositionAndDirection.point
-    Directions.withName(previousPositionAndDirection.direction) match {
+    previousPositionAndDirection.direction match {
       case North =>
         previousPositionAndDirection.copy(point =
           previousPosition.copy(y = previousPosition.y + 1)
@@ -44,12 +42,12 @@ object PositionAndDirection {
 
   def updateDirection(
       previousPositionAndDirection: PositionAndDirection,
-      turn: String): PositionAndDirection = {
-    val newDirection = Directions.withName(previousPositionAndDirection.direction) match {
-      case North => if (Instructions.withName(turn) == Left) "W" else "E"
-      case East  => if (Instructions.withName(turn) == Left) "N" else "S"
-      case South => if (Instructions.withName(turn) == Left) "E" else "W"
-      case West  => if (Instructions.withName(turn) == Left) "S" else "N"
+      turn: Instruction): PositionAndDirection = {
+    val newDirection: Direction = previousPositionAndDirection.direction match {
+      case North => if (turn == Left) West else East
+      case East  => if (turn == Left) North else South
+      case South => if (turn == Left) East else West
+      case West  => if (turn == Left) South else North
     }
     previousPositionAndDirection.copy(direction = newDirection)
   }

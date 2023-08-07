@@ -1,6 +1,6 @@
 package services
 
-import data.{Mower, Point}
+import data.{Direction, Instruction, Mower, Point}
 import data.TypeAliases.GardenSize
 
 import scala.util.{Failure, Success, Try}
@@ -12,7 +12,7 @@ case object ParseAndValidateService {
       case Some(points) => Success(points.split(" "))
       case _ => Failure(new NoSuchElementException)
     }
-    extractedValues.map(pointArray => Point(pointArray(0).toInt, pointArray(1).toInt))
+    extractedValues.map(pointArray => Point(validatePointValue(pointArray(0).toInt), validatePointValue(pointArray(1).toInt)))
       .recoverWith(exception => Failure(GardenSizeException(exception)))
   }
 
@@ -35,21 +35,31 @@ case object ParseAndValidateService {
     Try(
       rawPositionsAndInstructions
         .grouped(POSITION_AND_INSTRUCTION_LINES)
-        .map(lines => {
+        .map{lines =>
           val startingPositionAndDirection =
             lines(POSITION_AND_DIRECTION_LINE).split(" ")
-          val instructions = lines(INSTRUCTIONS_LINE).split("").toList
+
+          val instructions = lines(INSTRUCTIONS_LINE).split("")
+            .map(instruction => Instruction.withName(instruction))
+            .toList
+
           Mower.mower(
             startingPositionAndDirection(X_POSITION).toInt,
             startingPositionAndDirection(Y_POSITION).toInt,
-            startingPositionAndDirection(
+            Direction.withName(startingPositionAndDirection(
               DIRECTION_POSITION
-            ),
+            )),
             instructions
           )
-        })
-        .toList
-    ).recoverWith(exception => Failure(MowerMovementException(exception)))
+          }.toList)
+    .recoverWith(exception => Failure(MowerParsingException(exception)))
   }
+
+private def validatePointValue(value: Int): Int = {
+  value match {
+    case x if x >= 0 => x
+    case _ => "A".toInt
+  }
+}
 
 }

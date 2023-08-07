@@ -23,9 +23,9 @@ case class FormatService() {
   def buildCsvOutput(dataToWrite: FunProgResult): String = {
     def getCsvLineFromData(mower: Mower, index: Int): String = {
       val (xFin, yFin, direction) = extractFinFromMower(mower)
-      s"${index.toString};${mower.debut.point.x.toString};${mower.debut.point.y.toString};${mower.debut.direction};" +
+      s"${index.toString};${mower.debut.point.x.toString};${mower.debut.point.y.toString};${mower.debut.direction.entryName};" +
         s"$xFin;$yFin;$direction;" +
-        s"${mower.instructions.mkString}"
+        s"${mower.instructions.map(_.entryName).mkString}"
     }
 
     dataToWrite.tondeuses.zipWithIndex
@@ -70,7 +70,7 @@ case class FormatService() {
         4
       ) :::
       List(
-        basicSpacing.repeat(4).concat(directionKey + mower.debut.direction)
+        basicSpacing.repeat(4).concat(directionKey + mower.debut.direction.entryName)
       ) :::
       instructionsToYaml(mower)
         .appended(basicSpacing.repeat(2).concat(endPoint)) :::
@@ -84,7 +84,7 @@ case class FormatService() {
         (
           posAndDirAndInstr.point.x.toString,
           posAndDirAndInstr.point.y.toString,
-          posAndDirAndInstr.direction
+          posAndDirAndInstr.direction.entryName
         )
       )
       .getOrElse(("", "", ""))
@@ -92,6 +92,6 @@ case class FormatService() {
 
   private def instructionsToYaml(mower: Mower): List[String] = {
     List(basicSpacing.repeat(2).concat(instructions)) ::: mower.instructions
-      .map(instr => "  - " + instr)
+      .map(instr => "  - " + instr.entryName)
   }
 }

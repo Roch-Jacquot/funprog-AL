@@ -1,7 +1,9 @@
 package services
 
 import better.files.File
-import data.{FunProgResult, Mower, Point, PositionAndDirection}
+import data.Direction.North
+import data.Instruction._
+import data.{FunProgResult, Instruction, Mower, Point, PositionAndDirection}
 import org.scalatest.Succeeded
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -14,15 +16,16 @@ class FileServiceTest extends AnyFunSuite {
   val resultFileCsv = "src/test/resources/result.csv"
   val resultFileYaml = "src/test/resources/result.yaml"
 
-  val fileService: FileService = FileService()
+  val fileService = FileService
+  val parseAndValidateService = ParseAndValidateService
   val formatService: FormatService = FormatService()
   val resultingWork: FunProgResult = FunProgResult(
     Point(2, 2),
     List(
       Mower(
-        PositionAndDirection(Point(1, 1), "N"),
-        List("A", "D", "A", "G"),
-        Some(PositionAndDirection(Point(2, 2), "N"))
+        PositionAndDirection(Point(1, 1), North),
+        List[Instruction](Forward, Right, Forward, Left),
+        Some(PositionAndDirection(Point(2, 2), North))
       )
     )
   )
@@ -48,7 +51,7 @@ class FileServiceTest extends AnyFunSuite {
 
   test("extractGardenSizeFromString should extract the gardenSize") {
     val rawGardenSize = Some("5 5")
-    val result = fileService.extractGardenSizeFromString(rawGardenSize)
+    val result = parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
     result match {
       case Success(value) => assert(value === Point(5, 5))
       case _              => fail("Should not pass through here")
@@ -57,7 +60,7 @@ class FileServiceTest extends AnyFunSuite {
 
   test("extractGardenSizeFromString should return a failure") {
     val rawGardenSize = Some("5 ")
-    val result = fileService.extractGardenSizeFromString(rawGardenSize)
+    val result = parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
     result match {
       case Failure(failure) =>
         assert(failure.getClass.getSimpleName === "GardenSizeException")
