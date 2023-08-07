@@ -1,7 +1,7 @@
 package fr.esgi.al.funprog
 
 import com.typesafe.config.ConfigFactory
-import model.FunProgResult
+import model.{FunProgResult, MowerAfterMovement}
 import services.{FileService, FormatService, MowerService, ParseAndValidateService}
 import better.files._
 
@@ -49,7 +49,7 @@ object Main extends App {
         mower.instructions,
         gardenSizeAndMowers._1
       )
-      mower.copy(fin = Some(finalPositionAndDirection))
+      MowerAfterMovement.fromMowerAtStart(mower, finalPositionAndDirection)
     }))
     mowersAtFinalPositions
   }

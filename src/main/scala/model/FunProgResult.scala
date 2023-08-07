@@ -5,7 +5,7 @@ import play.api.libs.json.{Json, OWrites, Reads}
 
 case class FunProgResult(
     limite: GardenSize,
-    tondeuses: List[Mower]
+    tondeuses: List[MowerAfterMovement]
 )
 
 object FunProgResult {

@@ -3,7 +3,7 @@ package services
 import better.files.File
 import model.Direction.North
 import model.Instruction._
-import model.{FunProgResult, Instruction, Mower, Point, PositionAndDirection}
+import model.{FunProgResult, Instruction, MowerAfterMovement, Point, PositionAndDirection}
 import org.scalatest.Succeeded
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -17,15 +17,14 @@ class FileServiceTest extends AnyFunSuite {
   val resultFileYaml = "src/test/resources/result.yaml"
 
   val fileService = FileService
-  val parseAndValidateService = ParseAndValidateService
   val formatService: FormatService = FormatService()
   val resultingWork: FunProgResult = FunProgResult(
     Point(2, 2),
     List(
-      Mower(
+      MowerAfterMovement(
         PositionAndDirection(Point(1, 1), North),
         List[Instruction](Forward, Right, Forward, Left),
-        Some(PositionAndDirection(Point(2, 2), North))
+        PositionAndDirection(Point(2, 2), North)
       )
     )
   )
@@ -49,24 +48,6 @@ class FileServiceTest extends AnyFunSuite {
     }
   }
 
-  test("extractGardenSizeFromString should extract the gardenSize") {
-    val rawGardenSize = Some("5 5")
-    val result = parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
-    result match {
-      case Success(value) => assert(value === Point(5, 5))
-      case _              => fail("Should not pass through here")
-    }
-  }
-
-  test("extractGardenSizeFromString should return a failure") {
-    val rawGardenSize = Some("5 ")
-    val result = parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
-    result match {
-      case Failure(failure) =>
-        assert(failure.getClass.getSimpleName === "GardenSizeException")
-      case _ => fail("Should not pass through here")
-    }
-  }
   test(
     "writeJsonOutput should write a Json file for the object ResultingWork"
   ) {

@@ -1,6 +1,6 @@
 package services
 
-import model.{FunProgResult, Mower}
+import model.{FunProgResult, MowerAfterMovement}
 import play.api.libs.json.Json
 
 case class FormatService() {
@@ -21,7 +21,7 @@ case class FormatService() {
   private val point = "point:"
 
   def buildCsvOutput(dataToWrite: FunProgResult): String = {
-    def getCsvLineFromData(mower: Mower, index: Int): String = {
+    def getCsvLineFromData(mower: MowerAfterMovement, index: Int): String = {
       val (xFin, yFin, direction) = extractFinFromMower(mower)
       s"${index.toString};${mower.debut.point.x.toString};${mower.debut.point.y.toString};${mower.debut.direction.entryName};" +
         s"$xFin;$yFin;$direction;" +
@@ -51,6 +51,7 @@ case class FormatService() {
       dataToWrite.tondeuses.flatMap(mower => mowerToYamlFormat(mower))
     result.appendedAll(mowers).appended(yamlBorder)
   }
+
   private def pointToYamlFormat(
       x: String,
       y: String,
@@ -60,7 +61,8 @@ case class FormatService() {
       basicSpacing.repeat(repeat + 2).concat(xKey + x),
       basicSpacing.repeat(repeat + 2).concat(yKey + y)
     )
-  private def mowerToYamlFormat(mower: Mower): List[String] = {
+
+  private def mowerToYamlFormat(mower: MowerAfterMovement): List[String] = {
     val (xFin, yFin, direction) = extractFinFromMower(mower)
 
     List(startPoint) :::
@@ -78,19 +80,15 @@ case class FormatService() {
         .appended(basicSpacing.repeat(4).concat(directionKey + direction))
   }
 
-  private def extractFinFromMower(mower: Mower): (String, String, String) = {
-    mower.fin
-      .map(posAndDirAndInstr =>
+  private def extractFinFromMower(mower: MowerAfterMovement): (String, String, String) = {
         (
-          posAndDirAndInstr.point.x.toString,
-          posAndDirAndInstr.point.y.toString,
-          posAndDirAndInstr.direction.entryName
+          mower.fin.point.x.toString,
+          mower.fin.point.y.toString,
+          mower.fin.direction.entryName
         )
-      )
-      .getOrElse(("", "", ""))
   }
 
-  private def instructionsToYaml(mower: Mower): List[String] = {
+  private def instructionsToYaml(mower: MowerAfterMovement): List[String] = {
     List(basicSpacing.repeat(2).concat(instructions)) ::: mower.instructions
       .map(instr => "  - " + instr.entryName)
   }

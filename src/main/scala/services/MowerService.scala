@@ -49,9 +49,7 @@ case class MowerService() {
             instructions.drop(CURRENT_INSTRUCTION),
             gardenSize
           )
-        case _ => {
-          positionAndDirection
-        }
+        case _ => positionAndDirection
       }
   }
 

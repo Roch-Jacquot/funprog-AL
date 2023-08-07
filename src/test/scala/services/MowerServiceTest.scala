@@ -2,10 +2,8 @@ package services
 
 import model.Direction._
 import model.Instruction._
-import model.{FunProgResult, Instruction, Mower, Point, PositionAndDirection}
+import model.{FunProgResult, Instruction, MowerAfterMovement, Point, PositionAndDirection}
 import org.scalatest.funsuite.AnyFunSuite
-
-import scala.util.Success
 
 class MowerServiceTest extends AnyFunSuite {
 
@@ -13,46 +11,70 @@ class MowerServiceTest extends AnyFunSuite {
   val parseAndValidateService = ParseAndValidateService
 
   val resultingWork: FunProgResult = FunProgResult(
-    Point(2, 2),
+    Point(3, 3),
     List(
-      Mower(
+      MowerAfterMovement(
         PositionAndDirection(Point(1, 1), North),
         List[Instruction](Forward, Right, Forward, Left),
-        Some(PositionAndDirection(Point(2, 2), North))
+        PositionAndDirection(Point(2, 2), North)
       )
     )
   )
 
-  test("buildMowersFromLines should return a valid list of Mowers") {
-    val validStringList = List("1 1", "1 2 S", "AADDBC")
-    val result = parseAndValidateService.buildMowersFromLines(validStringList)
-    val expectedResult = List(
-      Mower(
-        PositionAndDirection(Point(1, 2), South),
-        List(Forward, Forward, Right, Right, Instruction.withName("B"), Instruction.withName("C")),
-        None
-      )
-    )
-    result match {
-      case Success(value) => assert(value === expectedResult)
-      case _              => fail("Should not pass through here")
-    }
-  }
-
-  test("moveMower should return a Mower with ") {
+  test("moveMower should return a new valid PositionAndDirection at Point(0,0)") {
     val mower = resultingWork.tondeuses(0)
     val result =
-      mowerService.moveMower(mower.debut, mower.instructions, Point(2, 2))
+      mowerService.moveMower(mower.debut, List[Instruction](Left, Forward, Left, Forward), resultingWork.limite)
+    val expectedResult = PositionAndDirection(Point(0, 0), South)
+    assert(result === expectedResult)
+  }
+
+  test("moveMower should return a new valid PositionAndDirection at Point(2, 2)") {
+    val mower = resultingWork.tondeuses(0)
+    val result =
+      mowerService.moveMower(mower.debut, mower.instructions, resultingWork.limite)
     val expectedResult = PositionAndDirection(Point(2, 2), North)
     assert(result === expectedResult)
   }
 
-  test("something") {
-    import services.FormatService
-    val formatService = FormatService()
-
-    val result = formatService.buildYamlOutput(resultingWork)
-
-    result.foreach(value => println(value))
+  test("moveMower should return a new valid PositionAndDirection at Point(1, 3)") {
+    val mower = resultingWork.tondeuses(0)
+    val result =
+      mowerService.moveMower(mower.debut, List[Instruction](Forward, Forward), resultingWork.limite)
+    val expectedResult = PositionAndDirection(Point(1, 3), North)
+    assert(result === expectedResult)
   }
+
+  test("moveMower should return a new valid PositionAndDirection at Point(1, 0)") {
+    val mower = resultingWork.tondeuses(0)
+    val result =
+      mowerService.moveMower(mower.debut, List[Instruction](Right, Right, Forward), resultingWork.limite)
+    val expectedResult = PositionAndDirection(Point(1, 0), South)
+    assert(result === expectedResult)
+  }
+
+  test("moveMower should return a new valid PositionAndDirection at Point(0, 1)") {
+    val mower = resultingWork.tondeuses(0)
+    val result =
+      mowerService.moveMower(mower.debut, List[Instruction](Left, Forward), resultingWork.limite)
+    val expectedResult = PositionAndDirection(Point(0, 1), West)
+    assert(result === expectedResult)
+  }
+
+  test("moveMower should return a new valid PositionAndDirection at Point(3, 1)") {
+    val mower = resultingWork.tondeuses(0)
+    val result =
+      mowerService.moveMower(mower.debut, List[Instruction](Right, Forward, Forward), resultingWork.limite)
+    val expectedResult = PositionAndDirection(Point(3, 1), East)
+    assert(result === expectedResult)
+  }
+
+  test("moveMower should return a new valid PositionAndDirection without changes") {
+    val mower = resultingWork.tondeuses(0)
+    val result =
+      mowerService.moveMower(mower.debut, List[Instruction](), resultingWork.limite)
+    val expectedResult = PositionAndDirection(Point(1, 1), North)
+    assert(result === expectedResult)
+  }
+
 }

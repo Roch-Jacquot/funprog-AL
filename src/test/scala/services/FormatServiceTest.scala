@@ -2,7 +2,7 @@ package services
 
 import model.Direction.North
 import model.Instruction._
-import model.{FunProgResult, Instruction, Mower, Point, PositionAndDirection}
+import model.{FunProgResult, Instruction, MowerAfterMovement, Point, PositionAndDirection}
 import org.scalatest.funsuite.AnyFunSuite
 
 class FormatServiceTest extends AnyFunSuite {
@@ -10,10 +10,10 @@ class FormatServiceTest extends AnyFunSuite {
   val resultingWork: FunProgResult = FunProgResult(
     Point(2, 2),
     List(
-      Mower(
+      MowerAfterMovement(
         PositionAndDirection(Point(1, 1), North),
         List[Instruction](Forward, Right, Forward, Left),
-        Some(PositionAndDirection(Point(2, 2), North))
+        PositionAndDirection(Point(2, 2), North)
       )
     )
   )
