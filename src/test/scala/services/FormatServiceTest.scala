@@ -1,8 +1,8 @@
 package services
 
-import data.Direction.North
-import data.Instruction._
-import data.{FunProgResult, Instruction, Mower, Point, PositionAndDirection}
+import model.Direction.North
+import model.Instruction._
+import model.{FunProgResult, Instruction, Mower, Point, PositionAndDirection}
 import org.scalatest.funsuite.AnyFunSuite
 
 class FormatServiceTest extends AnyFunSuite {

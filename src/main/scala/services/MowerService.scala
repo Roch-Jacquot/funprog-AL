@@ -1,9 +1,9 @@
 package services
 
-import data.Direction._
-import data.Instruction._
-import data.{Instruction, PositionAndDirection}
-import data.TypeAliases._
+import model.Direction._
+import model.Instruction._
+import model.{Instruction, PositionAndDirection}
+import model.TypeAliases._
 
 import scala.annotation.tailrec
 case class MowerService() {
@@ -24,9 +24,6 @@ case class MowerService() {
       positionAndDirection: PositionAndDirection,
       instructions: List[Instruction],
       gardenSize: GardenSize): PositionAndDirection = {
-      println(instructions)
-      println(instructions.isEmpty)
-    println("next move valid " +isNextAdvanceValid(positionAndDirection, gardenSize).toString)
       instructions match {
         case instruction::_ if instruction == Forward && isNextAdvanceValid(positionAndDirection, gardenSize) =>
             val nextPositionWithDirection =
@@ -43,7 +40,6 @@ case class MowerService() {
               gardenSize
             )
         case instruction::_ if instruction == Left || instruction == Right =>
-          println("updating direction with" + instruction.toString)
           val nextDirectionWithPosition = PositionAndDirection.updateDirection(
             positionAndDirection,
             instruction
@@ -54,7 +50,6 @@ case class MowerService() {
             gardenSize
           )
         case _ => {
-          println("No move")
           positionAndDirection
         }
       }

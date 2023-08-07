@@ -1,7 +1,7 @@
 package services
 
-import data.{Direction, Instruction, Mower, Point}
-import data.TypeAliases.GardenSize
+import model.{Direction, Instruction, Mower, Point}
+import model.TypeAliases.GardenSize
 
 import scala.util.{Failure, Success, Try}
 import util.FunProgExceptions._
@@ -9,10 +9,11 @@ case object ParseAndValidateService {
 
   def extractGardenSizeFromString(rawPoint: Option[String]): Try[GardenSize] = {
     val extractedValues = rawPoint match {
+      case Some(points) if points.contains('-') => Failure(new IllegalArgumentException())
       case Some(points) => Success(points.split(" "))
       case _ => Failure(new NoSuchElementException)
     }
-    extractedValues.map(pointArray => Point(validatePointValue(pointArray(0).toInt), validatePointValue(pointArray(1).toInt)))
+    extractedValues.map(pointArray => Point(pointArray(0).toInt, pointArray(1).toInt))
       .recoverWith(exception => Failure(GardenSizeException(exception)))
   }
 
@@ -23,6 +24,7 @@ case object ParseAndValidateService {
    * @param rawPositionsAndInstructions
    * @return
    */
+
   def buildMowersFromLines(
                             rawPositionsAndInstructions: List[String]): Try[List[Mower]] = {
     val POSITION_AND_INSTRUCTION_LINES = 2
@@ -32,34 +34,33 @@ case object ParseAndValidateService {
     val Y_POSITION = 1
     val DIRECTION_POSITION = 2
 
-    Try(
-      rawPositionsAndInstructions
-        .grouped(POSITION_AND_INSTRUCTION_LINES)
-        .map{lines =>
-          val startingPositionAndDirection =
-            lines(POSITION_AND_DIRECTION_LINE).split(" ")
+    val containsNegativeValues = rawPositionsAndInstructions
+      .grouped(POSITION_AND_INSTRUCTION_LINES).map(value => value(0).mkString).mkString.contains('-') match {
+      case true => Failure(new IllegalArgumentException)
+      case _ => Success(false)
+    }
 
-          val instructions = lines(INSTRUCTIONS_LINE).split("")
-            .map(instruction => Instruction.withName(instruction))
-            .toList
+    containsNegativeValues.flatMap { _ =>
+      Try(
+        rawPositionsAndInstructions
+          .grouped(POSITION_AND_INSTRUCTION_LINES)
+          .map { lines =>
+            val startingPositionAndDirection =
+              lines(POSITION_AND_DIRECTION_LINE).split(" ")
+            val instructions = lines(INSTRUCTIONS_LINE).split("")
+              .map(instruction => Instruction.withName(instruction))
+              .toList
 
-          Mower.mower(
-            startingPositionAndDirection(X_POSITION).toInt,
-            startingPositionAndDirection(Y_POSITION).toInt,
-            Direction.withName(startingPositionAndDirection(
-              DIRECTION_POSITION
-            )),
-            instructions
-          )
+            Mower.mower(
+              startingPositionAndDirection(X_POSITION).toInt,
+              startingPositionAndDirection(Y_POSITION).toInt,
+              Direction.withName(startingPositionAndDirection(
+                DIRECTION_POSITION
+              )),
+              instructions
+            )
           }.toList)
-    .recoverWith(exception => Failure(MowerParsingException(exception)))
+    }.recoverWith(exception => Failure(MowerParsingException(exception)))
   }
-
-private def validatePointValue(value: Int): Int = {
-  value match {
-    case x if x >= 0 => x
-    case _ => "A".toInt
-  }
-}
 
 }

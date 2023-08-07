@@ -1,6 +1,6 @@
-package data
+package model
 
-import data.TypeAliases.GardenSize
+import model.TypeAliases.GardenSize
 import play.api.libs.json.{Json, OWrites, Reads}
 
 case class FunProgResult(

@@ -1,6 +1,6 @@
 package services
 
-import data.{FunProgResult, Mower}
+import model.{FunProgResult, Mower}
 import play.api.libs.json.Json
 
 case class FormatService() {

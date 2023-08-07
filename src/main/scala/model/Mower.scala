@@ -1,4 +1,4 @@
-package data
+package model
 
 import play.api.libs.json._
 

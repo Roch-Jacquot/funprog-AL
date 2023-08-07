@@ -1,7 +1,7 @@
-package data
+package model
 
-import data.Direction._
-import data.Instruction._
+import model.Direction._
+import model.Instruction._
 import org.scalatest.funsuite.AnyFunSuite
 
 class PositionAndDirectionTest extends AnyFunSuite {

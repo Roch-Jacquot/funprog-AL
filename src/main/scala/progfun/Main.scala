@@ -1,7 +1,7 @@
 package fr.esgi.al.funprog
 
 import com.typesafe.config.ConfigFactory
-import data.FunProgResult
+import model.FunProgResult
 import services.{FileService, FormatService, MowerService, ParseAndValidateService}
 import better.files._
 

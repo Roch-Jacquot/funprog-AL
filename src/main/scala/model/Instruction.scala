@@ -1,4 +1,4 @@
-package data
+package model
 
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
