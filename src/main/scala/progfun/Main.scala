@@ -27,7 +27,7 @@ object Main extends App {
   private val parseAndValidateService = ParseAndValidateService
 
   // Constants
-  private val GARDEN_SIZE_LINE = 1;
+  private val GARDEN_SIZE_LINE = 1
 
   // Core Program
 

@@ -39,9 +39,13 @@ case object ParseAndValidateService {
     val X_POSITION = 0
     val Y_POSITION = 1
     val DIRECTION_POSITION = 2
+    val EMPTY_SEPARATOR = ""
+    val SPACE_SEPARATOR = " "
+    val MINUS_SIGN = '-'
 
+    //Throw error in case there is a "-" in the starting point
     val containsNegativeValues = rawPositionsAndInstructions
-      .grouped(POSITION_AND_INSTRUCTION_LINES).map(value => value(0).mkString).mkString.contains('-') match {
+      .grouped(POSITION_AND_INSTRUCTION_LINES).map(value => value(0).mkString).mkString.contains(MINUS_SIGN) match {
       case true => Failure(new IllegalArgumentException)
       case _ => Success(false)
     }
@@ -52,8 +56,8 @@ case object ParseAndValidateService {
           .grouped(POSITION_AND_INSTRUCTION_LINES)
           .map { lines =>
             val startingPositionAndDirection =
-              lines(POSITION_AND_DIRECTION_LINE).split(" ")
-            val instructions = lines(INSTRUCTIONS_LINE).split("")
+              lines(POSITION_AND_DIRECTION_LINE).split(SPACE_SEPARATOR)
+            val instructions = lines(INSTRUCTIONS_LINE).split(EMPTY_SEPARATOR)
               .map(instruction => Instruction.withName(instruction))
               .toList
 

@@ -16,7 +16,7 @@ class FileServiceTest extends AnyFunSuite {
   val resultFileCsv = "src/test/resources/result.csv"
   val resultFileYaml = "src/test/resources/result.yaml"
 
-  val fileService = FileService
+  private val fileService = FileService
   val formatService: FormatService = FormatService()
   val resultingWork: FunProgResult = FunProgResult(
     Point(2, 2),

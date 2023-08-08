@@ -9,7 +9,7 @@ case object FileService {
 
   /**
    * readLinesFromFile reads a predetermined file
-   * @param file
+   * @param file text file found in the configuration file
    * @return Try[List[String]]
    */
   def readLinesFromFile(file: String): Try[List[String]] = {

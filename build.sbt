@@ -3,7 +3,7 @@ import Dependencies._
 ThisBuild / scalaVersion     := "2.13.11"
 ThisBuild / version          := "0.1.0-SNAPSHOT"
 ThisBuild / organization     := "com.data"
-ThisBuild / organizationName := "model"
+ThisBuild / organizationName := "data"
 // Scalafmt
 ThisBuild / scalafmtOnCompile := true
 
