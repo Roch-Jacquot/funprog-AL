@@ -41,16 +41,8 @@ case object ParseAndValidateService {
     val DIRECTION_POSITION = 2
     val EMPTY_SEPARATOR = ""
     val SPACE_SEPARATOR = " "
-    val MINUS_SIGN = '-'
+    val MIN_POSITION = 0
 
-    //Throw error in case there is a "-" in the starting point
-    val containsNegativeValues = rawPositionsAndInstructions
-      .grouped(POSITION_AND_INSTRUCTION_LINES).map(value => value(0).mkString).mkString.contains(MINUS_SIGN) match {
-      case true => Failure(new IllegalArgumentException)
-      case _ => Success(false)
-    }
-
-    containsNegativeValues.flatMap { _ =>
       Try(
         rawPositionsAndInstructions
           .grouped(POSITION_AND_INSTRUCTION_LINES)
@@ -70,7 +62,16 @@ case object ParseAndValidateService {
               instructions
             )
           }.toList)
-    }.recoverWith(exception => Failure(MowerParsingException(exception)))
+        .flatMap(mowers => {
+          val debutPoints = mowers.map(mower => mower.debut)
+          val negativeValues = debutPoints.flatMap(positionAndDirection =>
+            List(positionAndDirection.point.x, positionAndDirection.point.y)).filter(_ < MIN_POSITION)
+          negativeValues match {
+            case _::_ => Failure(new IllegalArgumentException)
+            case _ => Success(mowers)
+          }
+        })
+        .recoverWith(exception => Failure(MowerParsingException(exception)))
   }
 
 }
