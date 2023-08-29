@@ -2,7 +2,7 @@ package model
 
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
-sealed abstract class Instruction(override val entryName: String) extends EnumEntry
+sealed abstract class Instruction(override val entryName: String) extends EnumEntry with Product with Serializable
 
 object Instruction extends Enum[Instruction] with PlayJsonEnum[Instruction]{
 
