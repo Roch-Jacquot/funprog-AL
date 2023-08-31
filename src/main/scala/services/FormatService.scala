@@ -23,7 +23,10 @@ case class FormatService() {
   def buildCsvOutput(dataToWrite: FunProgResult): String = {
     def getCsvLineFromData(mower: MowerAfterMovement, index: Int): String = {
       val (xFin, yFin, direction) = extractFinFromMower(mower)
-      s"${index.toString};${mower.debut.point.x.toString};${mower.debut.point.y.toString};${mower.debut.direction.entryName};" +
+      s"${index.toString};" +
+        s"${mower.debut.point.x.toString};" +
+        s"${mower.debut.point.y.toString};" +
+        s"${mower.debut.direction.entryName};" +
         s"$xFin;$yFin;$direction;" +
         s"${mower.instructions.map(_.entryName).mkString}"
     }

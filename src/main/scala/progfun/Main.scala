@@ -66,9 +66,8 @@ object Main extends App {
       .flatMap(_ =>
         fileService
           .writeCsvOutput(formatService.buildCsvOutput(result), csvOutputFile)
-          .flatMap(_ => fileService.writeYamlOutput(
-            formatService.buildYamlOutput(result),
-            yamlOutputFile)
+          .flatMap(_ =>
+            fileService.writeYamlOutput(formatService.buildYamlOutput(result), yamlOutputFile)
       )
       )
   }

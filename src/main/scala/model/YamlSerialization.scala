@@ -5,28 +5,29 @@ import model.Direction.North
 object YamlSerialization extends App{
 
   sealed trait YamlValue extends Product with Serializable{
-    def stringify: String
+    def stringify(spacing: Int): String
   }
 
   final case class YamlString(value: String) extends YamlValue{
-    override def stringify: String = value
+    override def stringify(spacing: Int): String = value
   }
 
   final case class YamlNumber(value: Int) extends YamlValue {
-    override def stringify: String = value.toString
+    override def stringify(spacing: Int): String = value.toString
   }
-
-  final case class YamlInstruction(value: Instruction) extends YamlValue {
-    override def stringify: String = value.entryName
-  }
+  
   final case class YamlArray(values: List[YamlValue]) extends YamlValue {
-    override def stringify: String = values.map(element => "\n- " + element.stringify).mkString
+    //override def stringify(spacing: Int): String = values.map(element => "\n" + " " * (spacing-2) + "- " + element.stringify(spacing)).mkString
+    override def stringify(spacing: Int): String = values.map(element =>"\n" + " " * (spacing-2) + "- " + element.stringify(spacing)).mkString
+      .replaceAll("-   ", "- ")
+
   }
 
   final case class YamlObject(values: Map[String, YamlValue]) extends YamlValue {
-    override def stringify: String = values.map{
-      case (key, value:YamlObject) => key +": \n  " + value.stringify
-      case (key, value) => key +": " + value.stringify
+    override def stringify(spacing: Int): String = values.map{
+      case (key, value:YamlObject) => " " * spacing + key +": \n" + value.stringify(spacing+2)
+      case (key, value:YamlArray) => " " * spacing + key + ":" + value.stringify(spacing+2)
+      case (key, value) => " " * spacing + key +": " + value.stringify(spacing)
     }
       .mkString("\n")
   }
@@ -58,6 +59,13 @@ object YamlSerialization extends App{
     ))
   }
 
+  implicit object FunProgResultConverter extends YamlConverter[FunProgResult] {
+    override def convert(funProgResult: FunProgResult): YamlValue = YamlObject(Map(
+      "limite" -> funProgResult.limite.toYaml,
+      "tondeuses" -> YamlArray(funProgResult.tondeuses.map(
+        tondeuse => tondeuse.toYaml))
+    ))
+  }
 
 
   implicit class YamlOps[T](value: T) {
@@ -70,5 +78,8 @@ object YamlSerialization extends App{
 
   val mower: MowerAfterMovement = MowerAfterMovement(posi, List(Instruction.Left, Instruction.Right), posi)
 
-  println(mower.toYaml.stringify)
+  println(FunProgResult(point, List(mower, mower)).toYaml.stringify(0))
+
+  val test = FunProgResult(point, List(mower, mower)).toYaml.toString
+  println(test)
 }

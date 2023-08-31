@@ -25,8 +25,10 @@ case object FileService {
    * @return Try[File]
    */
   def writeJsonOutput(dataToWrite: String, file: File): Try[File] = {
-    Try(file.createFileIfNotExists().overwrite(dataToWrite))
-      .recoverWith(exception => Failure(FileWritingException(exception)))
+    Try(file.createFileIfNotExists()
+      .overwrite(dataToWrite))
+      .recoverWith(exception =>
+        Failure(FileWritingException(exception)))
   }
 
   /**
@@ -36,8 +38,10 @@ case object FileService {
    * @return Try[File]
    */
   def writeCsvOutput(dataCsvFormat: String, file: File): Try[File] = {
-    Try(file.createFileIfNotExists().overwrite(dataCsvFormat))
-      .recoverWith(exception => Failure(FileWritingException(exception)))
+    Try(file.createFileIfNotExists()
+      .overwrite(dataCsvFormat))
+      .recoverWith(exception =>
+        Failure(FileWritingException(exception)))
   }
 
   /**
@@ -48,9 +52,12 @@ case object FileService {
    */
   def writeYamlOutput(yamlDataFormat: List[String], file: File): Try[File] = {
     Try {
-      val blankFile = file.createFileIfNotExists().overwrite("")
-      yamlDataFormat.foreach(element => blankFile.appendLine(element))
+      val blankFile = file.createFileIfNotExists()
+        .overwrite("")
+      yamlDataFormat.foreach(element =>
+        blankFile.appendLine(element))
       blankFile
-    }.recoverWith(exception => Failure(FileWritingException(exception)))
+    }.recoverWith(exception =>
+      Failure(FileWritingException(exception)))
   }
 }

@@ -15,12 +15,17 @@ case object ParseAndValidateService {
    */
   def extractGardenSizeFromString(rawPoint: Option[String]): Try[GardenSize] = {
     val extractedValues = rawPoint match {
-      case Some(points) if points.contains('-') => Failure(new IllegalArgumentException())
-      case Some(points) => Success(points.split(" "))
-      case _ => Failure(new NoSuchElementException)
+      case Some(points) if points.contains('-') =>
+        Failure(new IllegalArgumentException())
+      case Some(points) =>
+        Success(points.split(" "))
+      case _ =>
+        Failure(new NoSuchElementException)
     }
-    extractedValues.map(pointArray => Point(pointArray(0).toInt, pointArray(1).toInt))
-      .recoverWith(exception => Failure(GardenSizeException(exception)))
+    extractedValues.map(pointArray =>
+      Point(pointArray(0).toInt, pointArray(1).toInt))
+      .recoverWith(exception =>
+        Failure(GardenSizeException(exception)))
   }
 
   /**
@@ -71,7 +76,8 @@ case object ParseAndValidateService {
             case _ => Success(mowers)
           }
         })
-        .recoverWith(exception => Failure(MowerParsingException(exception)))
+        .recoverWith(exception =>
+          Failure(MowerParsingException(exception)))
   }
 
 }
