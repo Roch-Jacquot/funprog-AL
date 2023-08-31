@@ -2,7 +2,13 @@ package services
 
 import model.Direction.North
 import model.Instruction._
-import model.{FunProgResult, Instruction, MowerAfterMovement, Point, PositionAndDirection}
+import model.{
+  FunProgResult,
+  Instruction,
+  MowerAfterMovement,
+  Point,
+  PositionAndDirection
+}
 import org.scalatest.funsuite.AnyFunSuite
 
 class FormatServiceTest extends AnyFunSuite {
@@ -48,29 +54,12 @@ class FormatServiceTest extends AnyFunSuite {
     "buildYamlOutput should return a string in a Json format from resultingWork"
   ) {
     val result = formatService.buildYamlOutput(resultingWork)
-    val expectedResult = List(
-      "---",
-      "limite:",
-      " x: 2",
-      " y: 2",
-      "tondeuses:",
-      "- debut:",
-      "    point:",
-      "      x: 1",
-      "      y: 1",
-      "    direction: N",
-      "  instructions:",
-      "  - A",
-      "  - D",
-      "  - A",
-      "  - G",
-      "  fin:",
-      "    point:",
-      "      x: 2",
-      "      y: 2",
-      "    direction: N",
-      "---"
-    )
+    val expectedResult =
+      "limite:\n  x: 2\n  y: 2\n" +
+        "tondeuses:\n" +
+        "- debut:\n    point:\n      x: 1\n      y: 1\n    direction: N\n" +
+        "  instructions:\n  - A\n  - D\n  - A\n  - G\n" +
+        "  fin:\n    point:\n      x: 2\n      y: 2\n    direction: N"
     assert(result == expectedResult)
   }
 

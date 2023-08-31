@@ -2,7 +2,12 @@ package fr.esgi.al.funprog
 
 import com.typesafe.config.ConfigFactory
 import model.{FunProgResult, MowerAfterMovement}
-import services.{FileService, FormatService, MowerService, ParseAndValidateService}
+import services.{
+  FileService,
+  FormatService,
+  MowerService,
+  ParseAndValidateService
+}
 import better.files._
 
 import scala.util.{Failure, Success, Try}
@@ -36,8 +41,10 @@ object Main extends App {
     .readLinesFromFile(dataFile)
     .flatMap(lines => {
       for {
-        gardenSize <- parseAndValidateService.extractGardenSizeFromString(lines.headOption)
-        mowersAtInitialPosition <- parseAndValidateService.buildMowersFromLines(lines.drop(GARDEN_SIZE_LINE))
+        gardenSize <- parseAndValidateService
+          .extractGardenSizeFromString(lines.headOption)
+        mowersAtInitialPosition <- parseAndValidateService
+          .buildMowersFromLines(lines.drop(GARDEN_SIZE_LINE))
       } yield (gardenSize, mowersAtInitialPosition)
     })
 
@@ -67,14 +74,18 @@ object Main extends App {
         fileService
           .writeCsvOutput(formatService.buildCsvOutput(result), csvOutputFile)
           .flatMap(_ =>
-            fileService.writeYamlOutput(formatService.buildYamlOutput(result), yamlOutputFile)
-      )
+            fileService.writeYamlOutput(
+              formatService.buildYamlOutput(result),
+              yamlOutputFile
+            )
+          )
       )
   }
 
   finalResult match {
-    case Success(_)       => println("Files created successfully")
-    case Failure(failedValue) => println("Execution failed due to : "+ failedValue.toString)
+    case Success(_) => println("Files created successfully")
+    case Failure(failedValue) =>
+      println("Execution failed due to : " + failedValue.toString)
   }
 
 }

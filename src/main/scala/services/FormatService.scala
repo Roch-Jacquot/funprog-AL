@@ -32,15 +32,16 @@ case class FormatService() {
   }
 
   def buildYamlOutput(dataToWrite: FunProgResult): String = {
-    dataToWrite.toYaml.stringify(0, isFirstLineOfArray = false)
+    dataToWrite.toYaml.stringify(0)
   }
 
-  private def extractFinFromMower(mower: MowerAfterMovement): (String, String, String) = {
-        (
-          mower.fin.point.x.toString,
-          mower.fin.point.y.toString,
-          mower.fin.direction.entryName
-        )
+  private def extractFinFromMower(
+      mower: MowerAfterMovement): (String, String, String) = {
+    (
+      mower.fin.point.x.toString,
+      mower.fin.point.y.toString,
+      mower.fin.direction.entryName
+    )
   }
 
 }
