@@ -50,13 +50,10 @@ case object FileService {
    * @param file
    * @return Try[File]
    */
-  def writeYamlOutput(yamlDataFormat: List[String], file: File): Try[File] = {
+  def writeYamlOutput(yamlDataFormat: String, file: File): Try[File] = {
     Try {
-      val blankFile = file.createFileIfNotExists()
-        .overwrite("")
-      yamlDataFormat.foreach(element =>
-        blankFile.appendLine(element))
-      blankFile
+      file.createFileIfNotExists()
+        .overwrite(yamlDataFormat)
     }.recoverWith(exception =>
       Failure(FileWritingException(exception)))
   }
