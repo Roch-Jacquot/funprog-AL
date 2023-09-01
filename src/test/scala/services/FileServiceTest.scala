@@ -3,7 +3,13 @@ package services
 import better.files.File
 import model.Direction.North
 import model.Instruction._
-import model.{FunProgResult, Instruction, MowerAfterMovement, Point, PositionAndDirection}
+import model.{
+  FunProgResult,
+  Instruction,
+  MowerAfterMovement,
+  Point,
+  PositionAndDirection
+}
 import org.scalatest.Succeeded
 import org.scalatest.funsuite.AnyFunSuite
 

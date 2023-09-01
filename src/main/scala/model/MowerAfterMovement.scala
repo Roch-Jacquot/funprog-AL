@@ -9,8 +9,10 @@ case class MowerAfterMovement(
 object MowerAfterMovement {
 
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
-  implicit val mowerRead: Reads[MowerAfterMovement] = Json.reads[MowerAfterMovement]
-  implicit val mowerWrite: OWrites[MowerAfterMovement] = Json.writes[MowerAfterMovement]
+  implicit val mowerRead: Reads[MowerAfterMovement] =
+    Json.reads[MowerAfterMovement]
+  implicit val mowerWrite: OWrites[MowerAfterMovement] =
+    Json.writes[MowerAfterMovement]
 
   def mower(
       x: Int,
@@ -23,8 +25,12 @@ object MowerAfterMovement {
   }
 
   def fromMowerAtStart(
-             mowerAtStart: MowerAtStart,
-             finalPosition: PositionAndDirection): MowerAfterMovement = {
-    new MowerAfterMovement(mowerAtStart.debut, mowerAtStart.instructions, finalPosition)
+      mowerAtStart: MowerAtStart,
+      finalPosition: PositionAndDirection): MowerAfterMovement = {
+    new MowerAfterMovement(
+      mowerAtStart.debut,
+      mowerAtStart.instructions,
+      finalPosition
+    )
   }
 }

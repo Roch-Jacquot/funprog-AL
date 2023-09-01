@@ -24,33 +24,37 @@ case class MowerService() {
       positionAndDirection: PositionAndDirection,
       instructions: List[Instruction],
       gardenSize: GardenSize): PositionAndDirection = {
-      instructions match {
-        case instruction::_ if instruction == Forward && isNextAdvanceValid(positionAndDirection, gardenSize) =>
-            val nextPositionWithDirection =
-              PositionAndDirection.updatePosition(positionAndDirection)
-            moveMower(
-              nextPositionWithDirection,
-              instructions.drop(CURRENT_INSTRUCTION),
-              gardenSize
-            )
-        case instruction::_ if instruction == Forward =>
-            moveMower(
-              positionAndDirection,
-              instructions.drop(CURRENT_INSTRUCTION),
-              gardenSize
-            )
-        case instruction::_ if instruction == Left || instruction == Right =>
-          val nextDirectionWithPosition = PositionAndDirection.updateDirection(
+    instructions match {
+      case instruction :: _
+          if instruction == Forward && isNextAdvanceValid(
             positionAndDirection,
-            instruction
-          )
-          moveMower(
-            nextDirectionWithPosition,
-            instructions.drop(CURRENT_INSTRUCTION),
             gardenSize
-          )
-        case _ => positionAndDirection
-      }
+          ) =>
+        val nextPositionWithDirection =
+          PositionAndDirection.updatePosition(positionAndDirection)
+        moveMower(
+          nextPositionWithDirection,
+          instructions.drop(CURRENT_INSTRUCTION),
+          gardenSize
+        )
+      case instruction :: _ if instruction == Forward =>
+        moveMower(
+          positionAndDirection,
+          instructions.drop(CURRENT_INSTRUCTION),
+          gardenSize
+        )
+      case instruction :: _ if instruction == Left || instruction == Right =>
+        val nextDirectionWithPosition = PositionAndDirection.updateDirection(
+          positionAndDirection,
+          instruction
+        )
+        moveMower(
+          nextDirectionWithPosition,
+          instructions.drop(CURRENT_INSTRUCTION),
+          gardenSize
+        )
+      case _ => positionAndDirection
+    }
   }
 
   /**

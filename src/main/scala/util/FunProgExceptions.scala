@@ -5,7 +5,7 @@ object FunProgExceptions {
   case class GardenSizeException(throwable: Throwable)
       extends Exception(throwable)
   case class MowerParsingException(throwable: Throwable)
-    extends Exception(throwable)
+      extends Exception(throwable)
 
   case class FileWritingException(throwable: Throwable)
       extends Exception(throwable)

@@ -13,25 +13,32 @@ class ParseAndValidateServiceTest extends AnyFunSuite {
 
   test("extractGardenSizeFromString should extract the gardenSize") {
     val rawGardenSize = Some("5 5")
-    val result = parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
+    val result =
+      parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
     result match {
       case Success(value) => assert(value === Point(5, 5))
-      case _ => fail("Should not pass through here")
+      case _              => fail("Should not pass through here")
     }
   }
 
-  test("extractGardenSizeFromString should return a failure due to a missing value") {
+  test(
+    "extractGardenSizeFromString should return a failure due to a missing value"
+  ) {
     val rawGardenSize = Some("5 ")
-    val result = parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
+    val result =
+      parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
     result match {
       case Failure(failure) =>
         assert(failure.getClass.getSimpleName === "GardenSizeException")
       case _ => fail("Should not pass through here")
     }
   }
-  test("extractGardenSizeFromString should return a failure due to an invalid value") {
+  test(
+    "extractGardenSizeFromString should return a failure due to an invalid value"
+  ) {
     val rawGardenSize = Some("5 X")
-    val result = parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
+    val result =
+      parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
     result match {
       case Failure(failure) =>
         assert(failure.getClass.getSimpleName === "GardenSizeException")
@@ -39,9 +46,12 @@ class ParseAndValidateServiceTest extends AnyFunSuite {
     }
   }
 
-  test("extractGardenSizeFromString should return a failure due to a negative number") {
+  test(
+    "extractGardenSizeFromString should return a failure due to a negative number"
+  ) {
     val rawGardenSize = Some("5 -5")
-    val result = parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
+    val result =
+      parseAndValidateService.extractGardenSizeFromString(rawGardenSize)
     result match {
       case Failure(failure) =>
         assert(failure.getClass.getSimpleName === "GardenSizeException")
@@ -49,11 +59,14 @@ class ParseAndValidateServiceTest extends AnyFunSuite {
     }
   }
 
-  test("buildMowersFromLines should return a MowerParsingException due to wrong instructions") {
+  test(
+    "buildMowersFromLines should return a MowerParsingException due to wrong instructions"
+  ) {
     val inValidStringList = List("1 2 S", "AADDBC")
     val result = parseAndValidateService.buildMowersFromLines(inValidStringList)
     result match {
-      case Failure(failure) => assert(failure.getClass.getSimpleName === "MowerParsingException")
+      case Failure(failure) =>
+        assert(failure.getClass.getSimpleName === "MowerParsingException")
       case _ => fail("Should not pass through here")
     }
   }
@@ -69,24 +82,30 @@ class ParseAndValidateServiceTest extends AnyFunSuite {
     )
     result match {
       case Success(success) => assert(success === expectedResult)
-      case _ => fail("Should not pass through here")
+      case _                => fail("Should not pass through here")
     }
   }
 
-  test("buildMowersFromLines should return a MowerParsingException due to a wrong direction") {
+  test(
+    "buildMowersFromLines should return a MowerParsingException due to a wrong direction"
+  ) {
     val inValidStringList = List("1 2 B", "AADD")
     val result = parseAndValidateService.buildMowersFromLines(inValidStringList)
     result match {
-      case Failure(failure) => assert(failure.getClass.getSimpleName === "MowerParsingException")
+      case Failure(failure) =>
+        assert(failure.getClass.getSimpleName === "MowerParsingException")
       case _ => fail("Should not pass through here")
     }
   }
 
-  test("buildMowersFromLines should return a MowerParsingException due to a negative starting point") {
+  test(
+    "buildMowersFromLines should return a MowerParsingException due to a negative starting point"
+  ) {
     val inValidStringList = List("1 -2 S", "AADD")
     val result = parseAndValidateService.buildMowersFromLines(inValidStringList)
     result match {
-      case Failure(failure) => assert(failure.getClass.getSimpleName === "MowerParsingException")
+      case Failure(failure) =>
+        assert(failure.getClass.getSimpleName === "MowerParsingException")
       case _ => fail("Should not pass through here")
     }
   }
